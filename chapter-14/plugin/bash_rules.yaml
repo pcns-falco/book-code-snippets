@@ -1,0 +1,6 @@
+- rule: Cat in the shell
+  desc: Match command lines starting with "cat".
+  condition: shell.command startswith "cat "
+  output: Cat in shell detected (command=%shell.command)
+  priority: DEBUG
+  source: bash
