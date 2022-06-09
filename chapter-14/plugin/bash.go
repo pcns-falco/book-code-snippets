@@ -15,15 +15,15 @@ import (
 	"github.com/falcosecurity/plugin-sdk-go/pkg/sdk/plugins/source"
 )
 
-// config represents the plugin configuration.
-type config struct {
+// bashPluginCfg represents the plugin configuration.
+type bashPluginCfg struct {
 	Path string
 }
 
 // bashPlugin holds the state of the plugin.
 type bashPlugin struct {
 	plugins.BasePlugin
-	config config
+	config bashPluginCfg
 }
 
 func (b *bashPlugin) Info() *plugins.Info {
