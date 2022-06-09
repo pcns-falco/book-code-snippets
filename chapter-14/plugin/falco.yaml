@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2021 The Falco Authors.
+# Copyright (C) 2022 The Falco Authors.
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,9 +42,6 @@ plugins:
   - name: bash
     library_path: /home/leogr/code/github.com/leogr/falco-book-code-snippets/chapter-14/plugin/libbash.so
     init_config: ""
-  # - name: full
-  #   library_path: /home/leogr/code/github.com/falcosecurity/plugin-sdk-go/examples/full/libfull.so
-  #   init_config: ""
 
 # Setting this list to empty ensures that the above plugins are *not*
 # loaded and enabled by default. If you want to use the above plugins,

@@ -29,7 +29,8 @@ type bashPlugin struct {
 // bashInstance holds the state of the current session.
 type bashInstance struct {
 	source.BaseInstance
-	t *tail.Tail
+	t      *tail.Tail
+	ticker *time.Ticker
 }
 
 func (b *bashPlugin) Info() *plugins.Info {
@@ -74,7 +75,8 @@ func (b *bashPlugin) Open(params string) (source.Instance, error) {
 	}
 
 	return &bashInstance{
-		t: t,
+		t:      t,
+		ticker: time.NewTicker(time.Millisecond * 30),
 	}, nil
 }
 
@@ -84,7 +86,7 @@ func (b *bashPlugin) Open(params string) (source.Instance, error) {
 // reusable memory buffer. A batch can be smaller than the maximum size.
 func (b *bashInstance) NextBatch(bp sdk.PluginState, evts sdk.EventWriters) (int, error) {
 	i := 0
-	timeout := time.After(30 * time.Millisecond)
+	b.ticker.Reset(time.Millisecond * 30)
 
 	for i < evts.Len() {
 		select {
@@ -103,7 +105,7 @@ func (b *bashInstance) NextBatch(bp sdk.PluginState, evts sdk.EventWriters) (int
 				return i, err
 			}
 			i++
-		case <-timeout:
+		case <-b.ticker.C:
 			// Timeout occurred, return early
 			return i, sdk.ErrTimeout
 		}
@@ -111,13 +113,6 @@ func (b *bashInstance) NextBatch(bp sdk.PluginState, evts sdk.EventWriters) (int
 
 	// The batch is full
 	return i, nil
-}
-
-// String produces a string representation of an event data produced by the
-// event source of this plugin. This method is mandatory for source plugins.
-func (m *bashPlugin) String(in io.ReadSeeker) (string, error) {
-	bb, err := io.ReadAll(in)
-	return string(bb), err
 }
 
 func (b *bashPlugin) Fields() []sdk.FieldEntry {
@@ -145,9 +140,13 @@ func (m *bashPlugin) Extract(req sdk.ExtractRequest, evt sdk.EventReader) error 
 }
 
 func init() {
-	p := &bashPlugin{}
-	extractor.Register(p)
-	source.Register(p)
+	plugins.SetFactory(func() plugins.Plugin {
+		p := &bashPlugin{}
+		extractor.Register(p)
+		source.Register(p)
+		return p
+	})
+
 }
 
 func main() {}
