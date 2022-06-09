@@ -26,13 +26,6 @@ type bashPlugin struct {
 	config config
 }
 
-// bashInstance holds the state of the current session.
-type bashInstance struct {
-	source.BaseInstance
-	t      *tail.Tail
-	ticker *time.Ticker
-}
-
 func (b *bashPlugin) Info() *plugins.Info {
 	return &plugins.Info{
 		ID:          999,
@@ -57,6 +50,13 @@ func (b *bashPlugin) Init(config string) error {
 
 	// else parse the provided config
 	return json.Unmarshal([]byte(config), &b.config)
+}
+
+// bashInstance holds the state of the current session.
+type bashInstance struct {
+	source.BaseInstance
+	t      *tail.Tail
+	ticker *time.Ticker
 }
 
 // Open opens the plugin source and starts a new capture session (e.g. stream
